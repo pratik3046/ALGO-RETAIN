@@ -13,35 +13,41 @@ datasource db {
 }
 
 model Question {
-  id          String    @id @default(cuid())
-  title       String
-  description String?
-  difficulty  String?
-  attempts    Attempt[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  title          String
+  platform       String?   // e.g., "LeetCode"
+  questionNumber String?   // e.g., "69"
+  difficulty     String?   // "Easy", "Medium", "Hard"
+  description    String?
+  attempts       Attempt[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model Attempt {
-  id         String         @id @default(cuid())
-  questionId String
-  question   Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  status     AttemptStatus  @default(PENDING)
-  notes      String?
-  patterns   Pattern[]
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+  id             String        @id @default(cuid())
+  questionId     String
+  question       Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  status         AttemptStatus @default(NOT_ATTEMPTED)
+  notes          String?
+  nextReviewDate DateTime?     // <-- The 7-Day Alarm Anchor!
+  patterns       Pattern[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+// Matched perfectly to your Figma UI!
+enum AttemptStatus {
+  MASTERED          // Completed on my own
+  PARTIAL_AI        // Partial idea + AI help
+  EXTERNAL_HELP     // No idea + External help
+  YOUTUBE           // YouTube Solution
+  NOT_ATTEMPTED     // Not Attempted
 }
 
 model Pattern {
-  id        String   @id @default(cuid())
-  name      String
+  id        String    @id @default(cuid())
+  name      String    @unique
   attempts  Attempt[]
-  createdAt DateTime @default(now())
-}
-
-enum AttemptStatus {
-  PENDING
-  COMPLETED
-  SKIPPED
+  createdAt DateTime  @default(now())
 }

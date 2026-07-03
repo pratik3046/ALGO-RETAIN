@@ -1,28 +1,24 @@
 // types/index.ts
-import { Prisma } from "@/app/generated/prisma";
+import { Prisma } from "@prisma/client";
 
-// 1. Validator for a Question that includes its associated attempts
-const questionWithDetailsArgs = Prisma.validator<Prisma.QuestionDefaultArgs>()({
+// 1. A Question that includes its past attempts and the pattern tags
+export type QuestionWithDetails = Prisma.QuestionGetPayload<{
   include: {
     attempts: {
       include: {
-        patterns: true,
-      },
-    },
-  },
-});
+        patterns: true;
+      };
+    };
+  };
+}>;
 
-export type QuestionWithDetails = Prisma.QuestionGetPayload<typeof questionWithDetailsArgs>;
-
-// 2. Validator for an Attempt that includes its Question and Patterns
-const attemptWithQuestionArgs = Prisma.validator<Prisma.AttemptDefaultArgs>()({
+// 2. An Attempt that includes the associated Question (useful for the Review Queue)
+export type AttemptWithQuestion = Prisma.AttemptGetPayload<{
   include: {
-    question: true,
-    patterns: true,
-  },
-});
+    question: true;
+    patterns: true;
+  };
+}>;
 
-export type AttemptWithQuestion = Prisma.AttemptGetPayload<typeof attemptWithQuestionArgs>;
-
-// 3. Cleanly re-export the generated enum for our frontend forms
-export { AttemptStatus } from "@/app/generated/prisma";
+// 3. Re-exporting the standard Prisma enums for our frontend forms
+export { AttemptStatus } from "@prisma/client";
